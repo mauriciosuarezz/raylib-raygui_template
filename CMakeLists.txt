@@ -1,13 +1,8 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project(project_name LANGUAGES C CXX)
+project(data_security LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# 📂 Crear carpetas si no existen
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/assets)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
 # 📂 Redirigir ejecutable a /dist
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist)
@@ -45,5 +40,13 @@ if(WIN32)
     )
 endif()
 
-# Macro para assets
-target_compile_definitions(${PROJECT_NAME} PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
+# Definición de ruta de assets relativa al ejecutable (para portabilidad)
+target_compile_definitions(${PROJECT_NAME} PUBLIC ASSETS_PATH="assets/")
+
+# 📁 Copiar carpeta de assets al directorio de salida (dist)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets"
+    COMMENT "Sincronizando assets en /dist..."
+)

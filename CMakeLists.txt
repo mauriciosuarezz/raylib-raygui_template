@@ -1,3 +1,7 @@
+# 📁 Asegurar que existan las carpetas necesarias antes de empezar
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/dist")
+
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(data_security LANGUAGES C CXX)
 
@@ -7,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 📂 Redirigir ejecutable a /dist
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist)
 
-# 🔧 Configuración de rutas para la nueva versión de Raylib
+# 🔧 Configuración de rutas para la versión de Raylib
 set(RAYLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/raylib/include)
 set(RAYLIB_LIB_DIR     ${CMAKE_CURRENT_SOURCE_DIR}/libs/raylib/lib)
 
@@ -24,16 +28,18 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 # 📚 Enlaza la librería estática y las dependencias de Windows
-# Nota: 'raylib' ahora se busca como archivo físico
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${RAYLIB_LIB_DIR}/libraylib.a
     opengl32
     gdi32
     winmm
+    shell32
+    setupapi
 )
 
-# 🚀 Automatización: Evita "Permission Denied"
 if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--subsystem,console")
+    
     add_custom_command(TARGET ${PROJECT_NAME} PRE_LINK
         COMMAND cmd /c "taskkill /F /IM ${PROJECT_NAME}.exe /T 2>nul || exit 0"
         COMMENT "Cerrando ejecutable antiguo..."

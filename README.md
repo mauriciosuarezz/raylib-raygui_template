@@ -13,3 +13,5 @@ change the .exe name into the cmakelist.txt "project( *HERE* LANGUAGES C CXX )"
 Enjoy :P
 
 (btw this is my first "serius" github repository)
+
+DOESNT WORK WITH LINUX
